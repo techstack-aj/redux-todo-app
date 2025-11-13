@@ -5,6 +5,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { fetchTodosThunk } from '../../features/todos/todosThunks';
+import { fetchTodosRequest } from '../../features/todos/todosSagaActions';
 import { TodoItem } from './TodoItem';
 import { AddTodo } from './AddTodo';
 import { TodoFilters } from './TodoFilters';
@@ -12,11 +13,16 @@ import { TodoFilters } from './TodoFilters';
 export const TodoList: React.FC = () => {
   const dispatch = useAppDispatch();
   const { items, filter, loading, error } = useAppSelector((state) => state.todos);
+  const { middlewareType } = useAppSelector((state) => state.auth);
 
-  // Todos beim Mount laden
+  // Todos beim Mount laden - dynamisch je nach Login-Typ
   useEffect(() => {
-    dispatch(fetchTodosThunk());
-  }, [dispatch]);
+    if (middlewareType === 'saga') {
+      dispatch(fetchTodosRequest());
+    } else {
+      dispatch(fetchTodosThunk());
+    }
+  }, [dispatch, middlewareType]);
 
   // Gefilterte Todos (memoized für Performance)
   const filteredTodos = useMemo(() => {
@@ -40,7 +46,9 @@ export const TodoList: React.FC = () => {
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>📝 Todo App - Redux Thunk</h1>
+      <h1 style={styles.title}>
+        📝 Todo App - {middlewareType === 'saga' ? 'Redux Saga' : middlewareType === 'thunk' ? 'Redux Thunk' : 'Redux'}
+      </h1>
 
       {/* Add Todo Form */}
       <AddTodo />

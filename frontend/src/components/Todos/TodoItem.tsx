@@ -3,7 +3,9 @@
 // ============================================
 
 import React, { useState } from 'react';
-import { useAppDispatch } from '../../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+// TODO EXERCISE 5: Importiere auch toggleTodoOptimisticRequest von todosSagaActions
+import { toggleTodoRequest, deleteTodoRequest, toggleTodoOptimisticRequest } from '../../features/todos/todosSagaActions';
 import { toggleTodoThunk, deleteTodoThunk, updateTodoThunk } from '../../features/todos/todosThunks';
 import { Todo } from '../../types';
 
@@ -13,17 +15,31 @@ interface TodoItemProps {
 
 export const TodoItem: React.FC<TodoItemProps> = ({ todo }) => {
   const dispatch = useAppDispatch();
+  const middlewareType = useAppSelector((state) => state.auth.middlewareType);
 
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(todo.text);
 
   const handleToggle = () => {
-    dispatch(toggleTodoThunk(todo.id));
+    // Dynamisch: Saga oder Thunk basierend auf Login-Typ
+    if (middlewareType === 'saga') {
+      // TODO EXERCISE 5: Ändere hier von toggleTodoRequest zu toggleTodoOptimisticRequest
+      // - dispatch(toggleTodoOptimisticRequest(todo.id))
+      // - Dies nutzt dann die optimistic update Saga!
+      dispatch(toggleTodoOptimisticRequest(todo.id));
+    } else {
+      dispatch(toggleTodoOptimisticRequest(todo.id));
+    }
   };
 
   const handleDelete = () => {
     if (window.confirm('Todo wirklich löschen?')) {
-      dispatch(deleteTodoThunk(todo.id));
+      // Dynamisch: Saga oder Thunk basierend auf Login-Typ
+      if (middlewareType === 'saga') {
+        dispatch(deleteTodoRequest(todo.id));
+      } else {
+        dispatch(deleteTodoThunk(todo.id));
+      }
     }
   };
 

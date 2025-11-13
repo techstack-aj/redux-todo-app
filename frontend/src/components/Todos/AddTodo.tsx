@@ -4,11 +4,13 @@
 
 import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { createTodoRequest } from '../../features/todos/todosSagaActions';
 import { createTodoThunk } from '../../features/todos/todosThunks';
 
 export const AddTodo: React.FC = () => {
   const dispatch = useAppDispatch();
   const { loading } = useAppSelector((state) => state.todos);
+  const middlewareType = useAppSelector((state) => state.auth.middlewareType);
 
   const [text, setText] = useState('');
 
@@ -16,8 +18,13 @@ export const AddTodo: React.FC = () => {
     e.preventDefault();
     
     if (text.trim()) {
-      dispatch(createTodoThunk(text.trim()));
-      setText(''); // Input clearen
+      // Dynamisch: Saga oder Thunk basierend auf Login-Typ
+      if (middlewareType === 'saga') {
+        dispatch(createTodoRequest(text.trim()));
+      } else {
+        dispatch(createTodoThunk(text.trim()));
+      }
+      setText('');
     }
   };
 
