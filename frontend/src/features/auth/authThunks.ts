@@ -39,8 +39,17 @@ import * as authService from '../../services/authService';
 export const loginThunk = (credentials: LoginCredentials) => {
   // TODO: Implementiere hier den Thunk
   // return async (dispatch: Dispatch) => { ... }
-  
-  throw new Error('loginThunk noch nicht implementiert');
+  return async (dispatch: Dispatch) => {
+    try {
+        dispatch(authStart());
+        const { user, token } = await authService.login(credentials);
+        dispatch(authSuccess({ user, token }));
+    } catch (error: any) {
+        const errorMessage =
+            error.response?.data?.error || error.message || 'Login fehlgeschlagen';
+        dispatch(authFailure(errorMessage));
+    }
+  };
 };
 
 // ============================================
@@ -56,8 +65,17 @@ export const loginThunk = (credentials: LoginCredentials) => {
  */
 export const registerThunk = (credentials: RegisterCredentials) => {
   // TODO: Implementiere hier den Thunk
-  
-  throw new Error('registerThunk noch nicht implementiert');
+  return async (dispatch: Dispatch) => {
+    try {
+        dispatch(authStart());
+        const { user, token } = await authService.register(credentials);
+        dispatch(authSuccess({ user, token }));
+    } catch (error: any) {
+        const errorMessage =
+            error.response?.data?.error || error.message || 'Registrierung fehlgeschlagen';
+        dispatch(authFailure(errorMessage));
+    }
+  };
 };
 
 // ============================================
@@ -76,8 +94,18 @@ export const registerThunk = (credentials: RegisterCredentials) => {
  */
 export const loadCurrentUserThunk = () => {
   // TODO: Implementiere hier den Thunk
-  
-  throw new Error('loadCurrentUserThunk noch nicht implementiert');
+  return async (dispatch: Dispatch) => {
+    try {
+        dispatch(authStart());
+        const user = await authService.getCurrentUser();
+        const token = localStorage.getItem('token');
+        if (token) {
+            dispatch(authSuccess({ user, token }));
+        }
+    } catch (error) {
+        dispatch(authFailure('Session abgelaufen. Bitte neu einloggen.'));
+    }
+  };
 };
 
 // ============================================

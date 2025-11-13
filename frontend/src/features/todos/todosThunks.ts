@@ -29,8 +29,17 @@ import * as todoService from '../../services/todoService';
  */
 export const fetchTodosThunk = () => {
   // TODO: Implementiere hier
-  
-  throw new Error('fetchTodosThunk noch nicht implementiert');
+  return async (dispatch: Dispatch) => {
+    try {
+        dispatch(fetchTodosStart());
+        const todos = await todoService.fetchTodos();
+        dispatch(fetchTodosSuccess(todos));
+    } catch (error: any) {
+        const errorMessage =
+            error.response?.data?.error || error.message || 'Fehler beim Laden der Todos';
+        dispatch(fetchTodosFailure(errorMessage));
+    }
+  };
 };
 
 // ============================================
@@ -46,8 +55,15 @@ export const fetchTodosThunk = () => {
  */
 export const createTodoThunk = (text: string) => {
   // TODO: Implementiere hier
-  
-  throw new Error('createTodoThunk noch nicht implementiert');
+  return async (dispatch: Dispatch) => {
+    try {
+        const newTodo = await todoService.createTodo(text);
+        dispatch(addTodo(newTodo));
+    } catch (error: any) {
+        // Optional: Fehlerbehandlung hier (z.B. Error-Logging)
+        console.error('Fehler beim Erstellen des Todos:', error);
+    }
+  };
 };
 
 // ============================================
@@ -63,8 +79,15 @@ export const createTodoThunk = (text: string) => {
  */
 export const updateTodoThunk = (id: string, updates: { text?: string; completed?: boolean }) => {
   // TODO: Implementiere hier
-  
-  throw new Error('updateTodoThunk noch nicht implementiert');
+  return async (dispatch: Dispatch) => {
+    try {
+        const updatedTodo = await todoService.updateTodo(id, updates);
+        dispatch(updateTodo(updatedTodo));
+    } catch (error: any) {
+        // Optional: Fehlerbehandlung hier (z.B. Error-Logging)
+        console.error('Fehler beim Aktualisieren des Todos:', error);
+    }
+  };
 };
 
 // ============================================
@@ -80,8 +103,16 @@ export const updateTodoThunk = (id: string, updates: { text?: string; completed?
  */
 export const deleteTodoThunk = (id: string) => {
   // TODO: Implementiere hier
+  return async (dispatch: Dispatch) => {
+    try {
+        await todoService.deleteTodo(id);
+        dispatch(removeTodo(id));
+    } catch (error: any) {
+        // Optional: Fehlerbehandlung hier (z.B. Error-Logging)
+        console.error('Fehler beim Löschen des Todos:', error);
+    }
+  };
   
-  throw new Error('deleteTodoThunk noch nicht implementiert');
 };
 
 // ============================================
@@ -97,8 +128,15 @@ export const deleteTodoThunk = (id: string) => {
  */
 export const toggleTodoThunk = (id: string) => {
   // TODO: Implementiere hier
-  
-  throw new Error('toggleTodoThunk noch nicht implementiert');
+  return async (dispatch: Dispatch) => {
+    try {
+        const updatedTodo = await todoService.toggleTodo(id);
+        dispatch(updateTodo(updatedTodo));
+    } catch (error: any) {
+        // Optional: Fehlerbehandlung hier (z.B. Error-Logging)
+        console.error('Fehler beim Toggeln des Todos:', error);
+    }
+  };
 };
 
 // ============================================
