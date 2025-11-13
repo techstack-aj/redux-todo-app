@@ -43,7 +43,7 @@ export const loginThunk = (credentials: LoginCredentials) => {
     try {
         dispatch(authStart());
         const { user, token } = await authService.login(credentials);
-        dispatch(authSuccess({ user, token }));
+        dispatch(authSuccess({ user, token, middlewareType: 'thunk' }));
     } catch (error: any) {
         const errorMessage =
             error.response?.data?.error || error.message || 'Login fehlgeschlagen';
@@ -69,7 +69,7 @@ export const registerThunk = (credentials: RegisterCredentials) => {
     try {
         dispatch(authStart());
         const { user, token } = await authService.register(credentials);
-        dispatch(authSuccess({ user, token }));
+        dispatch(authSuccess({ user, token, middlewareType: 'thunk' }));
     } catch (error: any) {
         const errorMessage =
             error.response?.data?.error || error.message || 'Registrierung fehlgeschlagen';

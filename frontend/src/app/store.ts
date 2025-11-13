@@ -13,6 +13,25 @@ import { configureStore } from '@reduxjs/toolkit';
 import authReducer from '../features/auth/authSlice';
 import todosReducer from '../features/todos/todosSlice';
 
+// für Redux Saga
+import createSagaMiddleware from 'redux-saga';
+import { all } from 'redux-saga/effects';
+import { authRootSaga } from '../features/auth/authSagas';
+import { todosRootSaga } from '../features/todos/todosSaga';
+
+const sagaMiddleware = createSagaMiddleware();
+
+// Root Saga kombiniert alle Feature-Sagas
+function* rootSaga() {
+    yield all([
+        authRootSaga(),
+        todosRootSaga()
+    ]);
+}
+
+// Store mit Saga Middleware konfigurieren
+// später
+
 // ============================================
 // STORE CONFIGURATION
 // ============================================
@@ -25,23 +44,32 @@ export const store = configureStore({
   // Redux Thunk ist standardmäßig in Redux Toolkit inkludiert!
   // Keine extra Konfiguration nötig
   
-  // Middleware-Konfiguration (später erweitert für Saga + Observable)
+  // Thunk: Middleware-Konfiguration (später erweitert für Saga + Observable)
+  // middleware: (getDefaultMiddleware) =>
+  //   getDefaultMiddleware({
+  //     // Thunk ist bereits dabei
+  //     thunk: true,
+      
+  //     // SerializableCheck für Dev Mode
+  //     serializableCheck: {
+  //       // Ignoriere Actions die nicht serializable sind
+  //       ignoredActions: ['auth/authSuccess', 'todos/addTodo'],
+  //     },
+  //   }),
+//     // DevTools im Development Mode
+//   devTools: process.env.NODE_ENV !== 'production',
+// });
+
+  // Füge Saga Middleware hinzu
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      // Thunk ist bereits dabei
       thunk: true,
-      
-      // SerializableCheck für Dev Mode
       serializableCheck: {
-        // Ignoriere Actions die nicht serializable sind
         ignoredActions: ['auth/authSuccess', 'todos/addTodo'],
       },
-    }),
+    }).concat(sagaMiddleware), // Saga Middleware hinzufügen
+  });
   
-  // DevTools im Development Mode
-  devTools: process.env.NODE_ENV !== 'production',
-});
-
 // ============================================
 // TYPESCRIPT TYPES
 // ============================================
@@ -77,6 +105,12 @@ export type AppDispatch = typeof store.dispatch;
  * = Vorhersagbar & testbar
  */
 
+
+// Starte die Root Saga
+sagaMiddleware.run(rootSaga);
 console.log('🏪 Redux Store erstellt mit Redux Toolkit');
-console.log('✅ Middleware: Redux Thunk (Standard)');
+//console.log('✅ Middleware: Redux Thunk (Standard)');
+console.log('✅ Redux Saga Middleware gestartet');
 console.log('🔄 Später: Redux Saga & Redux Observable');
+
+

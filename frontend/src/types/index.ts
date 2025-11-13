@@ -26,6 +26,7 @@ export interface AuthState {
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
+  middlewareType: MiddlewareType | null;
 }
 
 // Todos State

@@ -5,6 +5,7 @@
 import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { registerThunk } from '../../features/auth/authThunks';
+import { registerRequest } from '../../features/auth/authSagaActions';
 
 interface RegisterFormProps {
   onSwitchToLogin: () => void;
@@ -61,7 +62,15 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) =
         {error && <div style={styles.error}>{error}</div>}
 
         <button type="submit" disabled={loading} style={styles.button}>
-          {loading ? 'Lädt...' : 'Registrieren'}
+          {loading ? 'Lädt...' : 'Registrieren (Thunk)'}
+        </button>
+        <button
+          type="button"
+          onClick={() => dispatch(registerRequest({ username, email, password }))}
+          disabled={loading}
+          style={styles.button}
+        >
+          Register (Saga)
         </button>
       </form>
 

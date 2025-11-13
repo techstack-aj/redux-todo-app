@@ -30,14 +30,17 @@ import * as todoService from '../../services/todoService';
 export const fetchTodosThunk = () => {
   // TODO: Implementiere hier
   return async (dispatch: Dispatch) => {
+    console.log('🟢 THUNK: fetchTodosThunk läuft');
     try {
         dispatch(fetchTodosStart());
         const todos = await todoService.fetchTodos();
         dispatch(fetchTodosSuccess(todos));
+        console.log('✅ THUNK: Todos erfolgreich geladen');
     } catch (error: any) {
         const errorMessage =
             error.response?.data?.error || error.message || 'Fehler beim Laden der Todos';
         dispatch(fetchTodosFailure(errorMessage));
+        console.error('❌ THUNK: Fehler beim Laden', error);
     }
   };
 };
@@ -56,12 +59,14 @@ export const fetchTodosThunk = () => {
 export const createTodoThunk = (text: string) => {
   // TODO: Implementiere hier
   return async (dispatch: Dispatch) => {
+    console.log('🟢 THUNK: createTodoThunk läuft für:', text);
     try {
         const newTodo = await todoService.createTodo(text);
         dispatch(addTodo(newTodo));
+        console.log('✅ THUNK: Todo erstellt');
     } catch (error: any) {
         // Optional: Fehlerbehandlung hier (z.B. Error-Logging)
-        console.error('Fehler beim Erstellen des Todos:', error);
+        console.error('❌ THUNK: Fehler beim Erstellen des Todos:', error);
     }
   };
 };
@@ -104,12 +109,14 @@ export const updateTodoThunk = (id: string, updates: { text?: string; completed?
 export const deleteTodoThunk = (id: string) => {
   // TODO: Implementiere hier
   return async (dispatch: Dispatch) => {
+    console.log('🟢 THUNK: deleteTodoThunk läuft für ID:', id);
     try {
         await todoService.deleteTodo(id);
         dispatch(removeTodo(id));
+        console.log('✅ THUNK: Todo gelöscht');
     } catch (error: any) {
         // Optional: Fehlerbehandlung hier (z.B. Error-Logging)
-        console.error('Fehler beim Löschen des Todos:', error);
+        console.error('❌ THUNK: Fehler beim Löschen des Todos:', error);
     }
   };
   
@@ -129,12 +136,14 @@ export const deleteTodoThunk = (id: string) => {
 export const toggleTodoThunk = (id: string) => {
   // TODO: Implementiere hier
   return async (dispatch: Dispatch) => {
+    console.log('🟢 THUNK: toggleTodoThunk läuft für ID:', id);
     try {
         const updatedTodo = await todoService.toggleTodo(id);
         dispatch(updateTodo(updatedTodo));
+        console.log('✅ THUNK: Todo umgeschaltet');
     } catch (error: any) {
         // Optional: Fehlerbehandlung hier (z.B. Error-Logging)
-        console.error('Fehler beim Toggeln des Todos:', error);
+        console.error('❌ THUNK: Fehler beim Toggeln des Todos:', error);
     }
   };
 };
