@@ -1,117 +1,89 @@
-# 🎯 REDUX THUNK TUTORIAL
+# Redux Thunk Tutorial
 
-## Lernziel
-Redux Thunk für asynchrone API-Calls implementieren und verstehen.
+## Was ist Redux Thunk?
+
+**Thunk** = Funktion die Funktion zurückgibt (verzögerte Ausführung)
+
+```typescript
+// Normal (synchron)
+const action = () => ({ type: 'ADD_TODO' });
+
+// Thunk (asynchron)
+const thunkAction = () => async (dispatch) => {
+  dispatch({ type: 'LOADING' });
+  const data = await api.call();
+  dispatch({ type: 'SUCCESS', payload: data });
+};
+```
 
 ---
 
-## 📚 Was ist Redux Thunk?
+## Flow
 
-**Thunk** = Funktion die eine Funktion zurückgibt (verzögerte Ausführung)
-
-### Normaler Action Creator (synchron):
-```typescript
-const normalAction = () => ({
-  type: 'ADD_TODO',
-  payload: { id: 1, text: 'Learn Redux' }
-});
+```
+Component → dispatch(loginThunk(credentials))
+   ↓
+Thunk Middleware erkennt Funktion
+   ↓
+Führt Funktion aus mit dispatch
+   ↓
+Thunk macht API Call
+   ↓
+Dispatcht start/success/failure Actions
+   ↓
+Reducer aktualisiert State
 ```
 
-### Thunk Action Creator (asynchron):
+---
+
+## Pattern
+
 ```typescript
-const thunkAction = () => {
-  return async (dispatch) => {
-    dispatch({ type: 'LOADING_START' });
-    const data = await fetchFromAPI();
-    dispatch({ type: 'SUCCESS', payload: data });
+export const actionThunk = (params) => {
+  return async (dispatch: Dispatch) => {
+    try {
+      dispatch(startAction());
+      const result = await apiService.call(params);
+      dispatch(successAction(result));
+    } catch (error: any) {
+      dispatch(failureAction(error.message));
+    }
   };
 };
 ```
 
 ---
 
-## 🔄 Wie funktioniert Redux Thunk?
-
-```
-1. Component ruft dispatch(loginThunk(credentials))
-   ↓
-2. Redux Thunk Middleware erkennt: "Das ist eine Funktion!"
-   ↓
-3. Middleware führt die Funktion aus und übergibt dispatch
-   ↓
-4. Thunk führt async Code aus (API Call)
-   ↓
-5. Thunk dispatcht mehrere Actions (start, success, failure)
-   ↓
-6. Reducers aktualisieren den State
-   ↓
-7. Components re-rendern mit neuem State
-```
-
----
-
-## 📝 AUFGABEN
-
-### ✅ AUFGABE 1: Login Thunk implementieren
+## Aufgabe: Login Thunk
 
 **Datei:** `frontend/src/features/auth/authThunks.ts`
 
-**Schritte:**
-1. Öffne die Datei `authThunks.ts`
-2. Finde die Funktion `loginThunk`
-3. Implementiere nach diesem Muster:
-
+**Implementiere:**
 ```typescript
 export const loginThunk = (credentials: LoginCredentials) => {
-  // Gib eine async Funktion zurück
   return async (dispatch: Dispatch) => {
     try {
-      // 1. Loading aktivieren
-      dispatch(authStart());
-
-      // 2. API Call (asynchron)
-      const response = await authService.login(credentials);
-
-      // 3. Success Action dispatchen
-      dispatch(authSuccess({
-        user: response.user,
-        token: response.token,
-      }));
-
-      // 4. Optional: Logging
-      console.log('✅ Login erfolgreich');
+      dispatch(authStart({ loadingType: 'thunk' }));
+      const { user, token } = await authService.login(credentials);
+      dispatch(authSuccess({ user, token, middlewareType: 'thunk' }));
     } catch (error: any) {
-      // 5. Error extrahieren
-      const errorMessage = error.response?.data?.error 
-                        || error.message 
-                        || 'Login fehlgeschlagen';
-      
-      // 6. Failure Action dispatchen
+      const errorMessage = error.response?.data?.error || 'Login fehlgeschlagen';
       dispatch(authFailure(errorMessage));
-      
-      console.error('❌ Login Fehler:', errorMessage);
     }
   };
 };
 ```
 
 **Testen:**
-1. Backend starten: `cd backend && npm run dev`
-2. Frontend starten: `cd frontend && npm run dev`
-3. Öffne `http://localhost:5173`
-4. Registriere einen User
-5. Logge ein
-6. Schau in Redux DevTools (Actions: authStart, authSuccess)
+```bash
+# Terminal 1
+cd backend && npm run dev
 
----
+# Terminal 2
+cd frontend && npm run dev
+```
 
-### ✅ AUFGABE 2: Register Thunk
-
-**Fast identisch zu loginThunk!**
-
-Unterschiede:
-- Nutzt `authService.register(credentials)` statt `login`
-- Credentials haben zusätzlich `username` Feld
+Login mit: test@test.com / test123
 
 **Tipp:** Kopiere loginThunk und ändere nur den Service-Call!
 
