@@ -43,6 +43,12 @@ const todosSlice = createSlice({
     // Todo hinzufügen
     addTodo: (state, action: PayloadAction<Todo>) => {
       state.items.push(action.payload);
+      state.loading = false;
+    },
+
+    // Add Todo Start
+    addTodoStart: (state, action: PayloadAction<{ text: string }>) => {
+      state.loading = true;
     },
 
     // Todo aktualisieren
@@ -51,11 +57,18 @@ const todosSlice = createSlice({
       if (index !== -1) {
         state.items[index] = action.payload;
       }
+      state.loading = false;
+    },
+
+    // Update Todo Start
+    updateTodoStart: (state, action: PayloadAction<{ id: string; updates: { text?: string; completed?: boolean } }>) => {
+      state.loading = true;
     },
 
     // Todo löschen
     removeTodo: (state, action: PayloadAction<string>) => {
       state.items = state.items.filter((todo) => todo.id !== action.payload);
+      state.loading = false;
     },
 
     // Todo toggle (completed)
@@ -64,6 +77,17 @@ const todosSlice = createSlice({
       if (todo) {
         todo.completed = !todo.completed;
       }
+      state.loading = false;
+    },
+
+    // Toggle Todo Start
+    toggleTodoStart: (state, action: PayloadAction<{ id: string }>) => {
+      // nichts tun, Epic macht alles, wird getriggert durch diese Action
+    },
+
+    // Delete Todo Start
+    deleteTodoStart: (state, action: PayloadAction<{ id: string }>) => {
+      state.loading = true;
     },
 
     // Filter ändern
@@ -92,9 +116,13 @@ export const {
   fetchTodosSuccess,
   fetchTodosFailure,
   addTodo,
+  addTodoStart,
   updateTodo,
+  updateTodoStart,
   removeTodo,
   toggleTodoLocal,
+  toggleTodoStart,
+  deleteTodoStart,
   setFilter,
   clearTodosError,
   clearTodos,

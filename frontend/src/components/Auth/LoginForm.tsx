@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { loginThunk } from '../../features/auth/authThunks';
 import { loginRequest } from '../../features/auth/authSagaActions';
+import { authStart } from '../../features/auth/authSlice';
 
 interface LoginFormProps {
   onSwitchToRegister: () => void;
@@ -13,14 +14,12 @@ interface LoginFormProps {
 
 export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
   const dispatch = useAppDispatch();
-  const { loading, error } = useAppSelector((state) => state.auth);
+  const { loading, error, loadingType } = useAppSelector((state) => state.auth);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleThunkLogin = () => {
     if (email && password) {
       dispatch(loginThunk({ email, password }));
     }
@@ -30,7 +29,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
     <div style={styles.container}>
       <h2>Login</h2>
       
-      <form onSubmit={handleSubmit} style={styles.form}>
+      <div style={styles.form}>
         <input
           type="email"
           placeholder="Email"
@@ -51,8 +50,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
 
         {error && <div style={styles.error}>{error}</div>}
 
-        <button type="submit" disabled={loading} style={styles.button}>
-          {loading ? 'Lädt...' : 'Login (Thunk)'}
+        <button
+          type="button"
+          onClick={handleThunkLogin}
+          disabled={loading}
+          style={styles.button}
+        >
+          {loading && loadingType === 'thunk' ? 'Lädt...' : 'Login (Thunk)'}
         </button>
         <button
           type="button"
@@ -60,9 +64,17 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
           disabled={loading}
           style={styles.button}
         >
-          Login (Saga)
+          {loading && loadingType === 'saga' ? 'Lädt...' : 'Login (Saga)'}
         </button>
-      </form>
+        <button
+          type="button"
+          onClick={() => dispatch(authStart({ email, password, loadingType: 'observable' }))}
+          disabled={loading}
+          style={styles.button}
+        >
+          {loading && loadingType === 'observable' ? 'Lädt...' : 'Login (Observable)'}
+        </button>
+      </div>
 
       <p style={styles.switch}>
         Noch kein Account?{' '}

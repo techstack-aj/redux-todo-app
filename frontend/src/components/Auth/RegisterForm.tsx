@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { registerThunk } from '../../features/auth/authThunks';
 import { registerRequest } from '../../features/auth/authSagaActions';
+import { registerStart } from '../../features/auth/authSlice';
 
 interface RegisterFormProps {
   onSwitchToLogin: () => void;
@@ -71,6 +72,15 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitchToLogin }) =
           style={styles.button}
         >
           Register (Saga)
+        </button>
+
+        <button
+          type="button"
+          onClick={() => dispatch(registerStart({ username, email, password, loadingType: 'observable' }))}
+          disabled={loading}
+          style={styles.button}
+        >
+          Register (Observable)
         </button>
       </form>
 

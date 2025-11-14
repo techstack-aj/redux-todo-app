@@ -1,19 +1,9 @@
-// ============================================
-// REDUX STORE CONFIGURATION
-// ============================================
-// Zentraler Redux Store mit Redux Toolkit
-// 
-// WICHTIG FÜR ABSCHLUSSPROJEKT:
-// Hier werden später ALLE 3 Middleware kombiniert:
-// 1. Redux Thunk (Standard in Redux Toolkit) ✅
-// 2. Redux Saga (Tag 2 Vormittag) 🔄
-// 3. Redux Observable (Tag 2 Nachmittag) 🔄
-
+// Redux Store mit allen drei Middlewares: Thunk, Saga und Observable
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from '../features/auth/authSlice';
 import todosReducer from '../features/todos/todosSlice';
 
-// für Redux Saga
+// Redux Saga Middleware
 import createSagaMiddleware from 'redux-saga';
 import { all } from 'redux-saga/effects';
 import { authRootSaga } from '../features/auth/authSagas';
@@ -21,7 +11,14 @@ import { todosRootSaga } from '../features/todos/todosSaga';
 
 const sagaMiddleware = createSagaMiddleware();
 
-// Root Saga kombiniert alle Feature-Sagas
+// Redux-Observable Middleware
+import { createEpicMiddleware, combineEpics } from 'redux-observable';
+import { rootAuthEpic } from '../features/auth/authEpic';
+import { rootTodosEpic } from '../features/todos/todosEpic';
+
+const rootEpic = combineEpics(rootAuthEpic, rootTodosEpic);
+const epicMiddleware = createEpicMiddleware();
+
 function* rootSaga() {
     yield all([
         authRootSaga(),
@@ -29,29 +26,12 @@ function* rootSaga() {
     ]);
 }
 
-// Store mit Saga Middleware konfigurieren
-// später
-
-// ============================================
-// STORE CONFIGURATION
-// ============================================
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     todos: todosReducer,
   },
   
-  // Redux Thunk ist standardmäßig in Redux Toolkit inkludiert!
-  // Keine extra Konfiguration nötig
-  
-  // Thunk: Middleware-Konfiguration (später erweitert für Saga + Observable)
-  // middleware: (getDefaultMiddleware) =>
-  //   getDefaultMiddleware({
-  //     // Thunk ist bereits dabei
-  //     thunk: true,
-      
-  //     // SerializableCheck für Dev Mode
-  //     serializableCheck: {
   //       // Ignoriere Actions die nicht serializable sind
   //       ignoredActions: ['auth/authSuccess', 'todos/addTodo'],
   //     },
@@ -60,14 +40,27 @@ export const store = configureStore({
 //   devTools: process.env.NODE_ENV !== 'production',
 // });
 
-  // Füge Saga Middleware hinzu
+  // ============================================
+  // MIDDLEWARE CONFIGURATION
+  // ============================================
+  // Alle 3 Middlewares kombinieren:
+  // - Thunk (Standard in getDefaultMiddleware)
+  // - Saga (bereits hinzugefügt)
+  // - Observable (TODO: hier hinzufügen)
+  //
+  // SCHRITTE:
+  // 1. .concat(sagaMiddleware) ist bereits da
+  // 2. Füge .concat(epicMiddleware) nach sagaMiddleware hinzu
+  
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       thunk: true,
       serializableCheck: {
         ignoredActions: ['auth/authSuccess', 'todos/addTodo'],
       },
-    }).concat(sagaMiddleware), // Saga Middleware hinzufügen
+    })
+    .concat(sagaMiddleware)
+    .concat(epicMiddleware)
   });
   
 // ============================================
@@ -106,11 +99,31 @@ export type AppDispatch = typeof store.dispatch;
  */
 
 
-// Starte die Root Saga
+// ============================================
+// MIDDLEWARE START
+// ============================================
+// Saga und Epic Middleware müssen NACH Store-Erstellung gestartet werden!
+
+// Starte Redux Saga
 sagaMiddleware.run(rootSaga);
+
+// TODO: Starte Redux-Observable Epic Middleware
+// Schritte:
+// 1. epicMiddleware.run() aufrufen
+// 2. rootEpic als Parameter übergeben
+epicMiddleware.run(rootEpic);
+
+// ============================================
+// LOGGING
+// ============================================
 console.log('🏪 Redux Store erstellt mit Redux Toolkit');
-//console.log('✅ Middleware: Redux Thunk (Standard)');
-console.log('✅ Redux Saga Middleware gestartet');
-console.log('🔄 Später: Redux Saga & Redux Observable');
+console.log('✅ Middleware: Redux Thunk (Standard)');
+console.log('✅ Middleware: Redux Saga (gestartet)');
+console.log('✅ Middleware: Redux-Observable (gestartet)');
+console.log('');
+console.log('📚 Alle 3 Middleware-Arten werden gleichzeitig verwendet:');
+console.log('   1. Thunk → Promises & Async/Await');
+console.log('   2. Saga → Generators & Effects');
+console.log('   3. Observable → RxJS Streams & Operators');
 
 
