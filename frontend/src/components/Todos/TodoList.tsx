@@ -6,6 +6,7 @@ import React, { useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { fetchTodosThunk } from '../../features/todos/todosThunks';
 import { fetchTodosRequest } from '../../features/todos/todosSagaActions';
+import { fetchTodosStart } from '../../features/todos/todosSlice';
 import { TodoItem } from './TodoItem';
 import { AddTodo } from './AddTodo';
 import { TodoFilters } from './TodoFilters';
@@ -19,6 +20,8 @@ export const TodoList: React.FC = () => {
   useEffect(() => {
     if (middlewareType === 'saga') {
       dispatch(fetchTodosRequest());
+    } else if (middlewareType === 'observable') {
+      dispatch(fetchTodosStart());
     } else {
       dispatch(fetchTodosThunk());
     }
@@ -47,7 +50,7 @@ export const TodoList: React.FC = () => {
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>
-        📝 Todo App - {middlewareType === 'saga' ? 'Redux Saga' : middlewareType === 'thunk' ? 'Redux Thunk' : 'Redux'}
+        📝 Todo App - {middlewareType === 'saga' ? 'Redux Saga' : middlewareType === 'thunk' ? 'Redux Thunk' : middlewareType === 'observable' ? 'Redux Observable' : 'Redux'}
       </h1>
 
       {/* Add Todo Form */}

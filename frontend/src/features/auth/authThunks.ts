@@ -1,49 +1,18 @@
-// ============================================
-// AUTH THUNKS - Redux Thunk Middleware
-// ============================================
-// LERNZIEL: Redux Thunk für asynchrone Authentication implementieren
-// 
-// KONZEPT: Thunk = Funktion die eine Funktion zurückgibt (delayed dispatch)
-//
-// REDUX THUNK PATTERN:
-// 1. Action Creator gibt Funktion zurück (statt Action-Objekt)
-// 2. Diese Funktion erhält dispatch und getState als Parameter
-// 3. Kann mehrere Actions dispatchen (start, success, failure)
-// 4. Kann asynchronen Code ausführen (API Calls, setTimeout, etc.)
-
+// Auth Thunks - Redux Thunk für asynchrone Authentication
 import { Dispatch } from 'redux';
 import { authStart, authSuccess, authFailure } from './authSlice';
 import { LoginCredentials, RegisterCredentials } from '../../types';
 import * as authService from '../../services/authService';
 
-// ============================================
-// AUFGABE 1: LOGIN THUNK IMPLEMENTIEREN
-// ============================================
-/**
- * TODO: Implementiere den loginThunk
- * 
- * SCHRITTE:
- * 1. Gib eine Funktion zurück die (dispatch: Dispatch) als Parameter hat
- * 2. Diese Funktion soll async sein (kann await nutzen)
- * 3. In einem try-catch Block:
- *    - dispatch(authStart()) aufrufen (Loading aktivieren)
- *    - authService.login(credentials) awaiten
- *    - dispatch(authSuccess({ user, token })) mit Response-Daten
- *    - Optional: console.log für Debugging
- * 4. Im catch Block:
- *    - Error-Message extrahieren (error.response?.data?.error)
- *    - dispatch(authFailure(errorMessage))
- * 
- * HINWEIS: Das ist das klassische Thunk-Pattern!
- */
+// Thunk für Login mit API-Call und Error-Handling
 export const loginThunk = (credentials: LoginCredentials) => {
-  // TODO: Implementiere hier den Thunk
-  // return async (dispatch: Dispatch) => { ... }
   return async (dispatch: Dispatch) => {
     try {
-        dispatch(authStart());
+        console.log('🔵 THUNK: Login wird gestartet:', credentials.email);
+        dispatch(authStart({ loadingType: 'thunk' }));
         const { user, token } = await authService.login(credentials);
         dispatch(authSuccess({ user, token, middlewareType: 'thunk' }));
+        console.log('✅ THUNK: Login erfolgreich:', user);
     } catch (error: any) {
         const errorMessage =
             error.response?.data?.error || error.message || 'Login fehlgeschlagen';
@@ -52,24 +21,15 @@ export const loginThunk = (credentials: LoginCredentials) => {
   };
 };
 
-// ============================================
-// AUFGABE 2: REGISTER THUNK IMPLEMENTIEREN
-// ============================================
-/**
- * TODO: Implementiere den registerThunk
- * 
- * HINWEIS: Fast identisch zu loginThunk, nur anderer Service-Call:
- * - authService.register(credentials) statt login
- * - Gleiche Error-Handling Logik
- * - Gleiche Success-Handling Logik
- */
+// Thunk für Registrierung mit API-Call und Error-Handling
 export const registerThunk = (credentials: RegisterCredentials) => {
-  // TODO: Implementiere hier den Thunk
   return async (dispatch: Dispatch) => {
     try {
-        dispatch(authStart());
+        console.log('🔵 THUNK: Registrierung wird gestartet:', credentials.email);
+        dispatch(authStart({ loadingType: 'thunk' }));
         const { user, token } = await authService.register(credentials);
         dispatch(authSuccess({ user, token, middlewareType: 'thunk' }));
+        console.log('✅ THUNK: Registrierung erfolgreich:', user);
     } catch (error: any) {
         const errorMessage =
             error.response?.data?.error || error.message || 'Registrierung fehlgeschlagen';
@@ -78,8 +38,7 @@ export const registerThunk = (credentials: RegisterCredentials) => {
   };
 };
 
-// ============================================
-// AUFGABE 3: LOAD CURRENT USER THUNK (OPTIONAL)
+// Optional: Load Current User Thunk für persistente Sessions
 // ============================================
 /**
  * TODO: Implementiere loadCurrentUserThunk (für Token-Validierung)

@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { createTodoRequest } from '../../features/todos/todosSagaActions';
 import { createTodoThunk } from '../../features/todos/todosThunks';
+import { addTodoStart } from '../../features/todos/todosSlice';
 
 export const AddTodo: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -21,6 +22,8 @@ export const AddTodo: React.FC = () => {
       // Dynamisch: Saga oder Thunk basierend auf Login-Typ
       if (middlewareType === 'saga') {
         dispatch(createTodoRequest(text.trim()));
+      } else if (middlewareType === 'observable') {
+        dispatch(addTodoStart({ text: text.trim() }));
       } else {
         dispatch(createTodoThunk(text.trim()));
       }

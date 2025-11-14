@@ -87,6 +87,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password }: LoginRequest = req.body;
+    console.log('📥 Backend empfängt:', { email, password, body: req.body });
 
     // Validierung
     if (!email || !password) {

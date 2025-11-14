@@ -14,6 +14,7 @@ const initialState: AuthState = {
   loading: false,
   error: null,
   middlewareType: null,
+  loadingType: null, // Welcher Middleware-Typ lädt gerade
 };
 
 // ============================================
@@ -24,14 +25,33 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     // Login/Register Start
-    authStart: (state) => {
-      state.loading = true;
-      state.error = null;
+    authStart: {
+      reducer: (state, action: PayloadAction<{ loadingType?: 'thunk' | 'saga' | 'observable' }>) => {
+        state.loading = true;
+        state.error = null;
+        state.loadingType = action.payload.loadingType || null;
+      },
+      prepare: (payload?: { email?: string; password?: string; loadingType?: 'thunk' | 'saga' | 'observable' }) => {
+        return { payload: payload || {} };
+      }
+    },
+
+    // Register Start
+    registerStart : {
+      reducer: (state, action: PayloadAction<{ username: string, email: string, password: string, loadingType?: 'thunk' | 'saga' | 'observable' }>) => {
+        state.loading = true;
+        state.error = null;
+        state.loadingType = action.payload.loadingType || null;
+      },
+      prepare: (payload: { username: string, email: string, password: string, loadingType?: 'thunk' | 'saga' | 'observable' }) => {
+        return { payload };
+      }
     },
 
     // Login/Register Success
     authSuccess: (state, action: PayloadAction<{ user: User; token: string; middlewareType?: MiddlewareType }>) => {
       state.loading = false;
+      state.loadingType = null;
       state.isAuthenticated = true;
       state.user = action.payload.user;
       state.token = action.payload.token;
@@ -104,6 +124,7 @@ const authSlice = createSlice({
 // Actions exportieren
 export const {
   authStart,
+  registerStart,
   authSuccess,
   authFailure,
   logout,

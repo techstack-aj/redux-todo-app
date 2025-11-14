@@ -5,8 +5,9 @@
 import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 // TODO EXERCISE 5: Importiere auch toggleTodoOptimisticRequest von todosSagaActions
-import { toggleTodoRequest, deleteTodoRequest, toggleTodoOptimisticRequest } from '../../features/todos/todosSagaActions';
+import { toggleTodoRequest, deleteTodoRequest, toggleTodoOptimisticRequest, updateTodoRequest } from '../../features/todos/todosSagaActions';
 import { toggleTodoThunk, deleteTodoThunk, updateTodoThunk } from '../../features/todos/todosThunks';
+import { toggleTodoStart, deleteTodoStart, updateTodoStart } from '../../features/todos/todosSlice';
 import { Todo } from '../../types';
 
 interface TodoItemProps {
@@ -27,8 +28,10 @@ export const TodoItem: React.FC<TodoItemProps> = ({ todo }) => {
       // - dispatch(toggleTodoOptimisticRequest(todo.id))
       // - Dies nutzt dann die optimistic update Saga!
       dispatch(toggleTodoOptimisticRequest(todo.id));
+    } else if (middlewareType === 'observable') {
+      dispatch(toggleTodoStart({ id: todo.id }));
     } else {
-      dispatch(toggleTodoOptimisticRequest(todo.id));
+      dispatch(toggleTodoThunk(todo.id));
     }
   };
 
@@ -37,6 +40,8 @@ export const TodoItem: React.FC<TodoItemProps> = ({ todo }) => {
       // Dynamisch: Saga oder Thunk basierend auf Login-Typ
       if (middlewareType === 'saga') {
         dispatch(deleteTodoRequest(todo.id));
+      } else if (middlewareType === 'observable') {
+        dispatch(deleteTodoStart({ id: todo.id }));
       } else {
         dispatch(deleteTodoThunk(todo.id));
       }
@@ -50,7 +55,13 @@ export const TodoItem: React.FC<TodoItemProps> = ({ todo }) => {
 
   const handleSaveEdit = () => {
     if (editText.trim() && editText !== todo.text) {
-      dispatch(updateTodoThunk(todo.id, { text: editText.trim() }));
+      if (middlewareType === 'saga') {
+        dispatch(updateTodoRequest(todo.id, { text: editText.trim() }));
+      } else if (middlewareType === 'observable') {
+        dispatch(updateTodoStart({ id: todo.id, updates: { text: editText.trim() } }));
+      } else {
+        dispatch(updateTodoThunk(todo.id, { text: editText.trim() }));
+      }
     }
     setIsEditing(false);
   };

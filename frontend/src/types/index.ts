@@ -27,6 +27,7 @@ export interface AuthState {
   loading: boolean;
   error: string | null;
   middlewareType: MiddlewareType | null;
+  loadingType: 'thunk' | 'saga' | 'observable' | null;
 }
 
 // Todos State

@@ -1,8 +1,4 @@
-// ============================================
-// TODOS THUNKS - Redux Thunk Middleware
-// ============================================
-// LERNZIEL: Redux Thunk für Todo CRUD Operations implementieren
-
+// Todos Thunks - Redux Thunk für Todo CRUD Operations
 import { Dispatch } from 'redux';
 import {
   fetchTodosStart,
@@ -14,28 +10,15 @@ import {
 } from './todosSlice';
 import * as todoService from '../../services/todoService';
 
-// ============================================
-// AUFGABE 4: FETCH TODOS THUNK
-// ============================================
-/**
- * TODO: Implementiere fetchTodosThunk
- * 
- * SCHRITTE:
- * 1. Gib async Funktion zurück die dispatch erhält
- * 2. dispatch(fetchTodosStart()) -> Loading aktivieren
- * 3. const todos = await todoService.fetchTodos()
- * 4. dispatch(fetchTodosSuccess(todos))
- * 5. Catch Block: dispatch(fetchTodosFailure(errorMessage))
- */
+// Thunk für Fetch Todos mit Loading-State und Error-Handling
 export const fetchTodosThunk = () => {
-  // TODO: Implementiere hier
   return async (dispatch: Dispatch) => {
-    console.log('🟢 THUNK: fetchTodosThunk läuft');
     try {
+        console.log('🔵 THUNK: Lade Todos...');
         dispatch(fetchTodosStart());
         const todos = await todoService.fetchTodos();
         dispatch(fetchTodosSuccess(todos));
-        console.log('✅ THUNK: Todos erfolgreich geladen');
+        console.log('✅ THUNK: Todos geladen:', todos.length);
     } catch (error: any) {
         const errorMessage =
             error.response?.data?.error || error.message || 'Fehler beim Laden der Todos';
@@ -45,75 +28,48 @@ export const fetchTodosThunk = () => {
   };
 };
 
-// ============================================
-// AUFGABE 5: CREATE TODO THUNK
-// ============================================
-/**
- * TODO: Implementiere createTodoThunk
- * 
- * HINWEIS: 
- * - Parameter: text (string)
- * - API Call: todoService.createTodo(text)
- * - Success: dispatch(addTodo(newTodo))
- */
+// Thunk für Create Todo mit API-Call
 export const createTodoThunk = (text: string) => {
-  // TODO: Implementiere hier
   return async (dispatch: Dispatch) => {
-    console.log('🟢 THUNK: createTodoThunk läuft für:', text);
     try {
+        console.log('🔵 THUNK: Erstelle Todo:', text);
         const newTodo = await todoService.createTodo(text);
         dispatch(addTodo(newTodo));
-        console.log('✅ THUNK: Todo erstellt');
+        console.log('✅ THUNK: Todo erstellt:', newTodo);
     } catch (error: any) {
-        // Optional: Fehlerbehandlung hier (z.B. Error-Logging)
         console.error('❌ THUNK: Fehler beim Erstellen des Todos:', error);
     }
   };
 };
 
-// ============================================
-// AUFGABE 6: UPDATE TODO THUNK
-// ============================================
-/**
- * TODO: Implementiere updateTodoThunk
- * 
- * HINWEIS:
- * - Parameter: id (string), updates (object)
- * - API Call: todoService.updateTodo(id, updates)
- * - Success: dispatch(updateTodo(updatedTodo))
- */
+// Thunk für Update Todo mit API-Call
 export const updateTodoThunk = (id: string, updates: { text?: string; completed?: boolean }) => {
-  // TODO: Implementiere hier
   return async (dispatch: Dispatch) => {
     try {
+        console.log('🔵 THUNK: Aktualisiere Todo:', id, updates);
         const updatedTodo = await todoService.updateTodo(id, updates);
         dispatch(updateTodo(updatedTodo));
+        console.log('✅ THUNK: Todo aktualisiert:', updatedTodo);
     } catch (error: any) {
-        // Optional: Fehlerbehandlung hier (z.B. Error-Logging)
         console.error('Fehler beim Aktualisieren des Todos:', error);
     }
   };
 };
 
-// ============================================
-// AUFGABE 7: DELETE TODO THUNK
-// ============================================
+// Thunk für Delete Todo mit API-Call
 /**
- * TODO: Implementiere deleteTodoThunk
- * 
  * HINWEIS:
  * - Parameter: id (string)
  * - API Call: todoService.deleteTodo(id) -> kein return value
  * - Success: dispatch(removeTodo(id))
  */
 export const deleteTodoThunk = (id: string) => {
-  // TODO: Implementiere hier
   return async (dispatch: Dispatch) => {
-    console.log('🟢 THUNK: deleteTodoThunk läuft für ID:', id);
     try {
+        console.log('🔵 THUNK: Lösche Todo:', id);
         await todoService.deleteTodo(id);
         dispatch(removeTodo(id));
-        console.log('✅ THUNK: Todo gelöscht');
+        console.log('✅ THUNK: Todo gelöscht:', id);
     } catch (error: any) {
         // Optional: Fehlerbehandlung hier (z.B. Error-Logging)
         console.error('❌ THUNK: Fehler beim Löschen des Todos:', error);
@@ -134,13 +90,12 @@ export const deleteTodoThunk = (id: string) => {
  * - Success: dispatch(updateTodo(updatedTodo))
  */
 export const toggleTodoThunk = (id: string) => {
-  // TODO: Implementiere hier
   return async (dispatch: Dispatch) => {
-    console.log('🟢 THUNK: toggleTodoThunk läuft für ID:', id);
     try {
+        console.log('🔵 THUNK: Toggle Todo:', id);
         const updatedTodo = await todoService.toggleTodo(id);
         dispatch(updateTodo(updatedTodo));
-        console.log('✅ THUNK: Todo umgeschaltet');
+        console.log('✅ THUNK: Todo getoggled:', updatedTodo);
     } catch (error: any) {
         // Optional: Fehlerbehandlung hier (z.B. Error-Logging)
         console.error('❌ THUNK: Fehler beim Toggeln des Todos:', error);

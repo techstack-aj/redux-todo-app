@@ -8,7 +8,7 @@ import { fetchTodosRequest } from '../todos/todosSagaActions';
 // Worker Saga: Führt Login-Logik aus
 function* loginSaga(action: ReturnType<typeof loginRequest>): Generator<CallEffect | PutEffect, void, any> {
     try {
-        yield put(authStart());
+        yield put(authStart({ loadingType: 'saga' }));
         const response: Awaited<ReturnType<typeof authService.login>> = yield call(authService.login, action.payload);
         yield put(authSuccess({
             user: response.user,
@@ -25,7 +25,7 @@ function* loginSaga(action: ReturnType<typeof loginRequest>): Generator<CallEffe
 
 function* registerSaga(action: ReturnType<typeof registerRequest>): Generator<CallEffect | PutEffect, void, any> {
     try {
-        yield put(authStart());
+        yield put(authStart({ loadingType: 'saga' }));
         const response: Awaited<ReturnType<typeof authService.register>> = yield call(authService.register, action.payload);
         yield put(authSuccess({
             user: response.user,
